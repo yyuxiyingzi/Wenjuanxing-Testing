@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>工作记忆测试 - 硕士论文研究</title>
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-audio-keyboard-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-call-function@1.1.2"></script>
+    <link rel="stylesheet" href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .jspsych-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="jspsych-target"></div>
+
+    <script>
+        // 初始化jsPsych
+        const jsPsych = initJsPsych({
+            on_finish: function() {
+                // 实验结束时保存数据
+                saveData();
+            }
+        });
+
+        // 工作记忆测试配置
+        const testConfig = {
+            sentences: [
+                {
+                    group: 2,
+                    sentences: [
+                        { 
+                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET1-1.mp3", 
+                            reasonable: true, 
+                            lastWord: "symptoms" 
+                        },
+                        { 
+                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET1-2.mp3", 
+                            reasonable: false, 
+                            lastWord: "coughing" 
+                        }
+                    ]
+                },
+                {
+                    group: 2,
+                    sentences: [
+                        { 
+                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET2-1.mp3", 
+                            reasonable: true, 
+                            lastWord: "buried" 
+                        },
+                        { 
+                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET2-2.mp3", 
+                            reasonable: false, 
+                            lastWord: "areas" 
+                        }
+                    ]
+                },
+                {
+                    group: 3,
+                    sentences: [
+                        { 
+                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET3-1.mp3", 
+                            reasonable: true, 
+                            lastWord: "into" 
+                        },
+                        { 
+                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET3-2.mp3", 
+                            reasonable: true, 
+                            lastWord: "colleges" 
+                        },
+                        { 
+                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET3-3.mp3", 
+                            reasonable: false, 
+                            lastWord: "forest" 
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // 存储测试结果
+        let testResults = {
+            participant_id: generateParticipantID(),
+            start_time: new Date().toISOString(),
+            trials: []
+        };
+
+        // 生成参与者ID
+        function generateParticipantID() {
+            return 'P' + Date.now() + Math.floor(Math.random() * 1000);
+        }
+
+        // 保存数据函数
+        function saveData() {
+            const data = jsPsych.data.get().json();
+            testResults.end_time = new Date().toISOString();
+            testResults.jspsych_data = data;
+            
+            // 显示完成页面和数据
+            document.getElementById('jspsych-target').innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <h2>测试完成！</h2>
+                    <p>您的参与编码是：<strong>${testResults.participant_id}</strong></p>
+                    <p>请复制此编码，在返回问卷星后输入到相应位置。</p>
+                    <button onclick="downloadData()" style="padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 5px;">下载数据</button>
+                    <button onclick="copyParticipantID()" style="padding: 10px 20px; margin: 10px; background: #28a745; color: white; border: none; border-radius: 5px;">复制参与编码</button>
+                </div>
+            `;
+        }
+
+        // 下载数据
+        function downloadData() {
+            const dataStr = JSON.stringify(testResults, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `working_memory_${testResults.participant_id}.json`;
+            link.click();
+        }
+
+        // 复制参与编码
+        function copyParticipantID() {
+            navigator.clipboard.writeText(testResults.participant_id).then(() => {
+                alert('参与编码已复制到剪贴板！');
+            });
+        }
+
+        // 创建实验时间线
+        const timeline = [];
+
+        // 指导语
+        const instructions = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+                <div style="text-align: center;">
+                    <h2>工作记忆测试</h2>
+                    <p>在这个测试中，您将听到一些英文句子。</p>
+                    <p><strong>任务要求：</strong></p>
+                    <ol style="text-align: left; display: inline-block;">
+                        <li>听完每个句子后，判断它在语义上是否合理</li>
+                        <li>听完一组句子后，按顺序回忆每个句子的最后一个单词</li>
+                    </ol>
+                    <p>请确保在安静的环境中完成测试。</p>
+                    <p>按<strong>空格键</strong>开始。</p>
+                </div>
+            `,
+            choices: [' ']
+        };
+        timeline.push(instructions);
+
+        // 创建工作记忆测试试次
+        testConfig.sentences.forEach((group, groupIndex) => {
+            // 添加组开始提示
+            const groupIntro = {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: `
+                    <div style="text-align: center;">
+                        <h3>第 ${groupIndex + 1} 组</h3>
+                        <p>接下来将播放 <strong>${group.sentences.length} 个句子</strong></p>
+                        <p>请仔细聆听每个句子</p>
+                        <p>按<strong>空格键</strong>开始播放</p>
+                    </div>
+                `,
+                choices: [' ']
+            };
+            timeline.push(groupIntro);
+
+            // 播放每个句子并进行合理性判断
+            group.sentences.forEach((sentence, sentenceIndex) => {
+                // 播放音频并判断合理性
+                const audioTrial = {
+                    type: jsPsychAudioKeyboardResponse,
+                    stimulus: sentence.audio,
+                    choices: ['f', 'j'],
+                    prompt: `
+                        <div style="text-align: center;">
+                            <p>请听这个句子：</p>
+                            <p>听完后请判断是否合理：</p>
+                            <p><strong>F键 - 合理</strong> | <strong>J键 - 不合理</strong></p>
+                        </div>
+                    `,
+                    response_ends_trial: true,
+                    trial_ends_after_audio: false,
+                    on_start: function(trial) {
+                        trial.data = {
+                            trial_type: 'audio_judgment',
+                            group: groupIndex + 1,
+                            sentence: sentenceIndex + 1,
+                            expected_reasonable: sentence.reasonable,
+                            expected_last_word: sentence.lastWord
+                        };
+                    },
+                    on_finish: function(data) {
+                        data.correct_judgment = (
+                            (data.response === 'f' && sentence.reasonable) || 
+                            (data.response === 'j' && !sentence.reasonable)
+                        );
+                        testResults.trials.push({
+                            type: 'judgment',
+                            group: groupIndex + 1,
+                            sentence: sentenceIndex + 1,
+                            response: data.response,
+                            correct: data.correct_judgment,
+                            reaction_time: data.rt
+                        });
+                    }
+                };
+                timeline.push(audioTrial);
+            });
+
+            // 回忆阶段 - 输入最后一个单词
+            const recallTrial = {
+                type: jsPsychSurveyText,
+                questions: group.sentences.map((sentence, index) => ({
+                    prompt: `句子 ${index + 1} 的最后一个单词：`,
+                    name: `word_${index}`,
+                    required: true
+                })),
+                preamble: `
+                    <div style="text-align: center;">
+                        <h3>回忆阶段</h3>
+                        <p>请按顺序输入刚才听到的 ${group.sentences.length} 个句子的最后一个单词</p>
+                    </div>
+                `,
+                on_finish: function(data) {
+                    const responses = data.response;
+                    let allCorrect = true;
+                    
+                    group.sentences.forEach((sentence, index) => {
+                        const userAnswer = responses[`word_${index}`].trim().toLowerCase();
+                        const correct = userAnswer === sentence.lastWord.toLowerCase();
+                        if (!correct) allCorrect = false;
+                        
+                        testResults.trials.push({
+                            type: 'recall',
+                            group: groupIndex + 1,
+                            sentence: index + 1,
+                            user_answer: userAnswer,
+                            correct_answer: sentence.lastWord.toLowerCase(),
+                            correct: correct
+                        });
+                    });
+                    
+                    // 记录组是否通过
+                    testResults.trials.push({
+                        type: 'group_result',
+                        group: groupIndex + 1,
+                        passed: allCorrect
+                    });
+                }
+            };
+            timeline.push(recallTrial);
+        });
+
+        // 结束语
+        const endTrial = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+                <div style="text-align: center;">
+                    <h2>测试完成！</h2>
+                    <p>感谢您的参与！</p>
+                    <p>您的数据已保存，请返回问卷星继续。</p>
+                </div>
+            `,
+            choices: 'NO_KEYS',
+            trial_duration: 3000
+        };
+        timeline.push(endTrial);
+
+        // 开始实验
+        jsPsych.run(timeline);
+    </script>
+</body>
+</html>
