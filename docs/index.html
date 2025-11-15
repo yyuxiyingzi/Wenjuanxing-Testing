@@ -12,6 +12,8 @@
         body {
             font-family: 'Microsoft YaHei', sans-serif;
             background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
         }
         .jspsych-content {
             max-width: 800px;
@@ -27,70 +29,6 @@
     <div id="jspsych-target"></div>
 
     <script>
-        // 初始化jsPsych
-        const jsPsych = initJsPsych({
-            on_finish: function() {
-                // 实验结束时保存数据
-                saveData();
-            }
-        });
-
-        // 工作记忆测试配置
-        const testConfig = {
-            sentences: [
-                {
-                    group: 2,
-                    sentences: [
-                        { 
-                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET1-1.mp3", 
-                            reasonable: true, 
-                            lastWord: "symptoms" 
-                        },
-                        { 
-                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET1-2.mp3", 
-                            reasonable: false, 
-                            lastWord: "coughing" 
-                        }
-                    ]
-                },
-                {
-                    group: 2,
-                    sentences: [
-                        { 
-                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET2-1.mp3", 
-                            reasonable: true, 
-                            lastWord: "buried" 
-                        },
-                        { 
-                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET2-2.mp3", 
-                            reasonable: false, 
-                            lastWord: "areas" 
-                        }
-                    ]
-                },
-                {
-                    group: 3,
-                    sentences: [
-                        { 
-                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET3-1.mp3", 
-                            reasonable: true, 
-                            lastWord: "into" 
-                        },
-                        { 
-                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET3-2.mp3", 
-                            reasonable: true, 
-                            lastWord: "colleges" 
-                        },
-                        { 
-                            audio: "https://cdn.jsdelivr.net/gh/yyuxiyingzi/Wenjuanxing-Testing/SET3-3.mp3", 
-                            reasonable: false, 
-                            lastWord: "forest" 
-                        }
-                    ]
-                }
-            ]
-        };
-
         // 存储测试结果
         let testResults = {
             participant_id: generateParticipantID(),
@@ -101,24 +39,6 @@
         // 生成参与者ID
         function generateParticipantID() {
             return 'P' + Date.now() + Math.floor(Math.random() * 1000);
-        }
-
-        // 保存数据函数
-        function saveData() {
-            const data = jsPsych.data.get().json();
-            testResults.end_time = new Date().toISOString();
-            testResults.jspsych_data = data;
-            
-            // 显示完成页面和数据
-            document.getElementById('jspsych-target').innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <h2>测试完成！</h2>
-                    <p>您的参与编码是：<strong>${testResults.participant_id}</strong></p>
-                    <p>请复制此编码，在返回问卷星后输入到相应位置。</p>
-                    <button onclick="downloadData()" style="padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 5px;">下载数据</button>
-                    <button onclick="copyParticipantID()" style="padding: 10px 20px; margin: 10px; background: #28a745; color: white; border: none; border-radius: 5px;">复制参与编码</button>
-                </div>
-            `;
         }
 
         // 下载数据
@@ -137,6 +57,88 @@
             navigator.clipboard.writeText(testResults.participant_id).then(() => {
                 alert('参与编码已复制到剪贴板！');
             });
+        }
+
+        // 初始化jsPsych
+        const jsPsych = initJsPsych({
+            on_finish: function() {
+                // 实验结束时保存数据
+                saveData();
+            }
+        });
+
+        // 工作记忆测试配置
+        const testConfig = {
+            sentences: [
+                {
+                    group: 2,
+                    sentences: [
+                        { 
+                            audio: "SET1-1.mp3", 
+                            reasonable: true, 
+                            lastWord: "symptoms" 
+                        },
+                        { 
+                            audio: "SET1-2.mp3", 
+                            reasonable: false, 
+                            lastWord: "coughing" 
+                        }
+                    ]
+                },
+                {
+                    group: 2,
+                    sentences: [
+                        { 
+                            audio: "SET2-1.mp3", 
+                            reasonable: true, 
+                            lastWord: "buried" 
+                        },
+                        { 
+                            audio: "SET2-2.mp3", 
+                            reasonable: false, 
+                            lastWord: "areas" 
+                        }
+                    ]
+                },
+                {
+                    group: 3,
+                    sentences: [
+                        { 
+                            audio: "SET3-1.mp3", 
+                            reasonable: true, 
+                            lastWord: "into" 
+                        },
+                        { 
+                            audio: "SET3-2.mp3", 
+                            reasonable: true, 
+                            lastWord: "colleges" 
+                        },
+                        { 
+                            audio: "SET3-3.mp3", 
+                            reasonable: false, 
+                            lastWord: "forest" 
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // 保存数据函数
+        function saveData() {
+            const data = jsPsych.data.get().json();
+            testResults.end_time = new Date().toISOString();
+            testResults.jspsych_data = data;
+            
+            // 显示完成页面和数据
+            document.getElementById('jspsych-target').innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <h2>测试完成！</h2>
+                    <p>您的参与编码是：<strong>${testResults.participant_id}</strong></p>
+                    <p>请复制此编码，在返回问卷星后输入到相应位置。</p>
+                    <button onclick="downloadData()" style="padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 5px;">下载数据</button>
+                    <button onclick="copyParticipantID()" style="padding: 10px 20px; margin: 10px; background: #28a745; color: white; border: none; border-radius: 5px;">复制参与编码</button>
+                </div>
+            `;
         }
 
         // 创建实验时间线
@@ -184,7 +186,7 @@
                 // 播放音频并判断合理性
                 const audioTrial = {
                     type: jsPsychAudioKeyboardResponse,
-                    stimulus: sentence.audio,
+                    stimulus: sentence.audio, // 使用相对路径，因为音频文件在同一个docs文件夹中
                     choices: ['f', 'j'],
                     prompt: `
                         <div style="text-align: center;">
@@ -215,7 +217,8 @@
                             sentence: sentenceIndex + 1,
                             response: data.response,
                             correct: data.correct_judgment,
-                            reaction_time: data.rt
+                            reaction_time: data.rt,
+                            timestamp: new Date().toISOString()
                         });
                     }
                 };
@@ -251,7 +254,8 @@
                             sentence: index + 1,
                             user_answer: userAnswer,
                             correct_answer: sentence.lastWord.toLowerCase(),
-                            correct: correct
+                            correct: correct,
+                            timestamp: new Date().toISOString()
                         });
                     });
                     
@@ -259,27 +263,13 @@
                     testResults.trials.push({
                         type: 'group_result',
                         group: groupIndex + 1,
-                        passed: allCorrect
+                        passed: allCorrect,
+                        timestamp: new Date().toISOString()
                     });
                 }
             };
             timeline.push(recallTrial);
         });
-
-        // 结束语
-        const endTrial = {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: `
-                <div style="text-align: center;">
-                    <h2>测试完成！</h2>
-                    <p>感谢您的参与！</p>
-                    <p>您的数据已保存，请返回问卷星继续。</p>
-                </div>
-            `,
-            choices: 'NO_KEYS',
-            trial_duration: 3000
-        };
-        timeline.push(endTrial);
 
         // 开始实验
         jsPsych.run(timeline);
